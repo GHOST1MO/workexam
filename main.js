@@ -45,11 +45,10 @@ app.get('/getDirContent', function (req, respons) {
       user.getDirContent(result[0].username,req.query.path,(inResult) => {
         var x = inResult.map((item)=>{return item.name});
 
-        respons.end(JSON.stringify([...data,...x]));
+        respons.end(JSON.stringify([...data,...x].slice(req.query.start,req.query.end)));
       })
     })
   });
-
 });
 app.post('/UploadFile',urlencodedParser, function (req, respons) {
   user.checkUserToken(req.cookies.Token,(result) => {
@@ -117,11 +116,10 @@ app.put('/mkDir', function (req, respons) {
           })
         })
       });
-      
     })
-    
   });
-})
+});
+
 
 
 
@@ -129,6 +127,17 @@ var server = app.listen(8081, function () {
    var host = server.address().address
    var port = server.address().port
    
-   console.log("Example app listening at http://%s:%s", host, port)
+   console.log("app listening at http://%s:%s", host, port)
 })
 
+
+app.get('/search', function (req, respons) {
+  user.checkUserToken(req.cookies.Token,(result) => {
+    if (!result.length) respons.end(JSON.stringify({err:"Token not found"}));
+    var username = result[0].username;
+    user.checkDirPrivilege(result[0].username,req.query.path.substring(req.query.path.lastIndexOf("/")+1),req.query.path.substring(0,req.query.path.lastIndexOf("/")+1),(inResult) => {
+      if (!inResult.length) respons.end(JSON.stringify({err:"The dir does not exist"}));
+      
+    })
+  });
+});
