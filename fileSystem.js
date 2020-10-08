@@ -4,7 +4,8 @@ var fs = require('fs');
 
 
 exports.getFolderContent = (path,callback) => {
-  fs.readdir('./folders/'+ path,(err,files) =>{
+  fs.readdir('./folders/'+ path,{ withFileTypes: true },(err,content) =>{
+    const files = content.filter(item => item.isFile()).map(file => file.name);
     callback(err,files);
   })
 }
@@ -32,8 +33,10 @@ exports.checkDirEmpty = (path,callback) => {
 }
 
 exports.uploadFile = (path,file,callback)=>{
-  let avatar = req.files.avatar;
-      
-  avatar.mv('./folders/' +path+"/"+ avatar.name);
+  var src = fs.createReadStream(file.path);
+  var dest = fs.createWriteStream(path+'/'+file.originalname);
+  src.pipe(dest);
+  src.on('end',()=> callback(false));
+  src.on('error',()=>  callback(true));
 }
 

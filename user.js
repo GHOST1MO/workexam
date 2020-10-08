@@ -2,7 +2,7 @@ const { randomInt } = require('crypto');
 var db = require('./db');
 var req
 exports.logIn = (username, password,callback)=>{
-  db.query(`SELECT * FROM nodejsexam.user where username='${username}' and password = ${password};`,callback);
+  db.query(`SELECT * FROM nodejsexam.user where username='${username}' and password = '${password}';`,callback);
 }
 exports.createUserToken = (username,token,callback)=>{
   db.query(`INSERT INTO nodejsexam.token VALUES ('${token}', '${username}');`,callback);
